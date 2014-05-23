@@ -29,10 +29,8 @@
 
 #if !TARGET_OS_IPHONE
 
-static inline NSCompositingOperation CompositeOpForBlendMode(CGBlendMode mode)
-{
+static inline NSCompositingOperation CompositeOpForBlendMode(CGBlendMode mode) {
     switch (mode) {
-            
         case kCGBlendModeClear:
             return NSCompositeClear;
         case kCGBlendModeCopy:
@@ -109,9 +107,7 @@ static inline NSCompositingOperation CompositeOpForBlendMode(CGBlendMode mode)
 #if TARGET_OS_IPHONE
 	return (JRImageOrientation)super.imageOrientation;
 #else
-	@synchronized(self) {
-		return _orientation;
-	}
+    return _orientation;
 #endif
 }
 
@@ -144,38 +140,48 @@ NSData* JRImageJPEGRepresentation(JRImage *image, CGFloat compressionQuality) {
 	
     NSMutableDictionary *properties = [[NSMutableDictionary alloc] init];
     
-    // resolution
     CGFloat scale = image.scale;
     if (scale != 1.0 && scale > 0.001) {
-		CGFloat dpi = 72.0f * scale;
+		CGFloat dpi = 72.0 * scale;
 		properties[(id)kCGImagePropertyDPIWidth] = @(dpi);
         properties[(id)kCGImagePropertyDPIHeight] = @(dpi);
     }
     
-    // compression
-    compressionQuality = PIN(compressionQuality, 0.0, 1.0);    // pin compression to 0..1
+    compressionQuality = PIN(compressionQuality, 0.0, 1.0);
     properties[(id)kCGImageDestinationLossyCompressionQuality] = @(compressionQuality);
     
-    //  orientation
     NSInteger exifOrientation;
     switch (image.orientation) {
-		case JRImageOrientationUp: exifOrientation = 1; break;
-		case JRImageOrientationDown: exifOrientation = 3; break;
-		case JRImageOrientationLeft: exifOrientation = 8; break;
-		case JRImageOrientationRight: exifOrientation = 6; break;
-		case JRImageOrientationUpMirrored: exifOrientation = 2; break;
-		case JRImageOrientationDownMirrored: exifOrientation = 4; break;
-		case JRImageOrientationLeftMirrored: exifOrientation = 5; break;
-		case JRImageOrientationRightMirrored:  exifOrientation = 7; break;
+		case JRImageOrientationUp:
+            exifOrientation = 1;
+            break;
+        case JRImageOrientationUpMirrored:
+            exifOrientation = 2;
+            break;
+		case JRImageOrientationDown:
+            exifOrientation = 3;
+            break;
+        case JRImageOrientationDownMirrored:
+            exifOrientation = 4;
+            break;
+        case JRImageOrientationLeftMirrored:
+            exifOrientation = 5;
+            break;
+        case JRImageOrientationRight:
+            exifOrientation = 6;
+            break;
+        case JRImageOrientationRightMirrored:
+            exifOrientation = 7;
+            break;
+		case JRImageOrientationLeft:
+            exifOrientation = 8;
+            break;
     }
     properties[(id)kCGImagePropertyOrientation] = @(exifOrientation);
 	
-    // create storage
     bool success = NO;
     NSMutableData* data = [[NSMutableData alloc] init];
     if (data) {
-        // write out image
-        //
         CGImageDestinationRef imageDestination = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)data,
                                                                                   CFSTR("public.jpeg"),
                                                                                   1,

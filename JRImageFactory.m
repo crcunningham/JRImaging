@@ -26,10 +26,6 @@
 #import <libkern/OSAtomic.h>
 #import "JRImage.h"
 
-#define MaxGPUImageLoads (1)
-#define kCGImageSourceUseHardwareAcceleration @"kCGImageSourceUseHardwareAcceleration"
-#define kCGImageSourceSubsampleFactor @"kCGImageSourceSubsampleFactor"
-
 @implementation JRImageFactory
 
 static NSString* UTIFromExtension(NSString* extension){
@@ -75,7 +71,6 @@ static NSString* UTIFromExtension(NSString* extension){
 		imageUti = (NSString*)kUTTypeJPEG;
 	}
 	
-	static int32_t hardware;
 	JRImage *result = nil;
 	    
 	@autoreleasepool {
@@ -100,11 +95,6 @@ static NSString* UTIFromExtension(NSString* extension){
 				NSUInteger width = [((__bridge NSDictionary *)properties)[(id)kCGImagePropertyPixelWidth] unsignedIntegerValue];
 				NSUInteger height = [((__bridge NSDictionary *)properties)[(id)kCGImagePropertyPixelHeight] unsignedIntegerValue];
 				
-				// hardware decoding only works from one thread at a time as far as i can tell
-				if (OSAtomicIncrement32Barrier(&hardware) <= MaxGPUImageLoads) {
-					options[(id)kCGImageSourceUseHardwareAcceleration] = (id)kCFBooleanTrue;
-				}
-				
 				CGSize loadableImageSize = [JRImageFactory loadableImageSizeForImageSize:CGSizeMake(width, height)];
 				NSInteger calculatedMaxEdge = (NSInteger)MAX(loadableImageSize.width, loadableImageSize.height);
 				
@@ -118,7 +108,6 @@ static NSString* UTIFromExtension(NSString* extension){
 				CGImageRef image = CGImageSourceCreateThumbnailAtIndex(source, 0, (__bridge CFDictionaryRef)options);
                 result = [[JRImage alloc] initWithCGImage:image scale:1.0 orientation:JRImageOrientationUp];
                 CGImageRelease(image);
-				OSAtomicDecrement32Barrier(&hardware);
 				CFRelease(properties);
 			}
 
@@ -203,16 +192,9 @@ static NSString* UTIFromExtension(NSString* extension){
 		
         // date format: YYYY:MM:DD:hh:mm:ss
 		if ([dateString length] < 1 || [dateString hasPrefix:@"0000"]) {
-            // date string of "0000:00:00 00:00:00" the camera's date isn't set
 			// nothing we can do
 		} else {
-            
 			NSCalendar* calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-			
-			// If you wanted to do everything with a "standardized" time zone (since cameras don't have time zones),
-			// you could do everything in GMT.
-			// [calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			
 			NSDateComponents* components = [[NSDateComponents alloc] init];
 			int year, month, day, hour, minute, second;
 			sscanf([dateString UTF8String], "%d%*c%d%*c%d%*c%d%*c%d%*c%d", &year, &month, &day, &hour, &minute, &second);
@@ -223,7 +205,6 @@ static NSString* UTIFromExtension(NSString* extension){
 			[components setMinute:minute];
 			[components setSecond:second];
 			[components setTimeZone:[NSTimeZone localTimeZone]];
-			
 			date = [calendar dateFromComponents:components];
 		}
 		
@@ -273,7 +254,7 @@ static NSString* UTIFromExtension(NSString* extension){
         uti = (id)kUTTypeJPEG;
     }
     
-    NSDictionary * options = @{(id)kCGImageSourceTypeIdentifierHint : uti, (id)kCGImageSourceShouldCache : (id)kCFBooleanFalse};
+    NSDictionary * options = @{(id)kCGImageSourceTypeIdentifierHint : uti, (id)kCGImageSourceShouldCache : @NO};
     CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)options);
     
     if (source) {

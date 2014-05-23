@@ -23,7 +23,6 @@
 #import "JRAutoreleaseUtility.h"
 
 
-CGImageRef JRAutoreleaseImage(CGImageRef CF_CONSUMED object)
-{
+CGImageRef JRAutoreleaseImage(CGImageRef CF_CONSUMED object) {
     return (CGImageRef)[(id)object autorelease];
 }
