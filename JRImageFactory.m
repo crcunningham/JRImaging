@@ -176,7 +176,7 @@ static NSString* UTIFromExtension(NSString* extension){
 		NSDictionary * exif = metadata[(id)kCGImagePropertyExifDictionary];
 		if (exif) {
 			dateString = exif[(id)kCGImagePropertyExifDateTimeOriginal];
-			dateSubseconds = exif[(id)kCGImagePropertyExifSubsecTimeOrginal];
+			dateSubseconds = exif[(id)kCGImagePropertyExifSubsecTimeOriginal];
 			
 			if (!dateString) {
 				dateString = exif[(id)kCGImagePropertyExifDateTimeDigitized];
@@ -194,7 +194,7 @@ static NSString* UTIFromExtension(NSString* extension){
 		if ([dateString length] < 1 || [dateString hasPrefix:@"0000"]) {
 			// nothing we can do
 		} else {
-			NSCalendar* calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+			NSCalendar* calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 			NSDateComponents* components = [[NSDateComponents alloc] init];
 			int year, month, day, hour, minute, second;
 			sscanf([dateString UTF8String], "%d%*c%d%*c%d%*c%d%*c%d%*c%d", &year, &month, &day, &hour, &minute, &second);
