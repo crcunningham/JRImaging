@@ -63,5 +63,6 @@ JRImageFactory - Utilities for loading images on the GPU with edge bounding as w
 
 // pull out the metadata dictionary
 + (NSDictionary *)metadataFromData:(NSData *)data uti:(NSString *)uti;
++ (NSDictionary *)metadataFromUrl:(NSURL *)url uti:(NSString *)uti;
 ```
 
