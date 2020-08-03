@@ -58,5 +58,6 @@
 
 // pull out the metadata dictionary
 + (NSDictionary *)metadataFromData:(NSData *)data uti:(NSString *)uti;
++ (NSDictionary *)metadataFromUrl:(NSURL *)url uti:(NSString *)uti;
 
 @end

@@ -28,7 +28,7 @@
 
 @implementation JRImageFactory
 
-static NSString* UTIFromExtension(NSString* extension){
+static NSString* UTIFromExtension(NSString* extension) {
 	NSString* result = nil;
 	
 	for (NSString* type in [NSArray arrayWithObjects : (id)kUTTypeImage, (id)kUTTypeMovie, nil]) {
@@ -44,7 +44,7 @@ static NSString* UTIFromExtension(NSString* extension){
 	return result;
 }
 
-+ (CGSize)loadableImageSizeForImageSize:(CGSize)size{
++ (CGSize)loadableImageSizeForImageSize:(CGSize)size {
 	CGSize result;
 	
 	// The max edge that will be in memory is 2x edgeBound
@@ -63,7 +63,7 @@ static NSString* UTIFromExtension(NSString* extension){
 	return result;
 }
 
-+ (JRImage *)imageFromData:(NSData *)data uti:(NSString*)imageUti maxEdge:(NSInteger)maxEdge cache:(BOOL)cacheImage{
++ (JRImage *)imageFromData:(NSData *)data uti:(NSString*)imageUti maxEdge:(NSInteger)maxEdge cache:(BOOL)cacheImage {
 	if (!data) {
 		return nil;
 	}
@@ -118,7 +118,7 @@ static NSString* UTIFromExtension(NSString* extension){
 	return result;
 }
 
-+ (JRImage *)imageFromPath:(NSString*)path maxEdge:(NSInteger)edge cache:(BOOL)cache{
++ (JRImage *)imageFromPath:(NSString*)path maxEdge:(NSInteger)edge cache:(BOOL)cache {
 	JRImage *result = nil;
 	
 	if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
@@ -130,12 +130,12 @@ static NSString* UTIFromExtension(NSString* extension){
 	return result;
 }
 
-+ (JRImage *)scaledImageFromImage:(JRImage *)image maxEdge:(NSUInteger)edge{
++ (JRImage *)scaledImageFromImage:(JRImage *)image maxEdge:(NSUInteger)edge {
 	JRImage *result = image;
 	CGSize initialSize = image.size;
 	CGSize scaledSize;
 	
-	if (!MAX(initialSize.width, initialSize.height) < edge) {
+	if (MAX(initialSize.width, initialSize.height) > edge) {
 		CGFloat ratio;
 		
 		if (initialSize.width > initialSize.height) {
@@ -156,7 +156,7 @@ static NSString* UTIFromExtension(NSString* extension){
 		
 		[newImage lockFocus];
 		NSRect thumbnailRect = NSMakeRect(0.0, 0.0, scaledSize.width, scaledSize.height);
-		[image drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0];		
+        [image drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositingOperationCopy fraction:1.0];
 		[newImage unlockFocus];
 #endif
 	}
@@ -164,7 +164,7 @@ static NSString* UTIFromExtension(NSString* extension){
 	return result;
 }
 
-+ (NSTimeInterval)creationTimestampFromMetadata:(NSDictionary *)metadata{
++ (NSTimeInterval)creationTimestampFromMetadata:(NSDictionary *)metadata {
 	NSTimeInterval result = 0;
 	NSDate* date = nil;
 	
@@ -243,19 +243,35 @@ static NSString* UTIFromExtension(NSString* extension){
 	return result;
 }
 
-+ (CGSize)sizeFromMetadata:(NSDictionary *)metadata{
++ (CGSize)sizeFromMetadata:(NSDictionary *)metadata {
     NSUInteger width = [metadata[(id)kCGImagePropertyPixelWidth] unsignedIntegerValue];
     NSUInteger height = [metadata[(id)kCGImagePropertyPixelHeight] unsignedIntegerValue];
     return CGSizeMake(width, height);
 }
 
-+ (NSDictionary *)metadataFromData:(NSData *)data uti:(NSString *)uti{
++ (NSDictionary *)metadataFromData:(NSData *)data uti:(NSString *)uti {
     if (!uti) {
         uti = (id)kUTTypeJPEG;
     }
     
     NSDictionary * options = @{(id)kCGImageSourceTypeIdentifierHint : uti, (id)kCGImageSourceShouldCache : @NO};
     CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)options);
+    
+    if (source) {
+        CFDictionaryRef metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil);
+        CFRelease(source);
+        return CFBridgingRelease(metadata);
+    }
+    return nil;
+}
+
++ (NSDictionary *)metadataFromUrl:(NSURL *)url uti:(NSString *)uti {
+    if (!uti) {
+        uti = (id)kUTTypeJPEG;
+    }
+    
+    NSDictionary * options = @{(id)kCGImageSourceTypeIdentifierHint : uti, (id)kCGImageSourceShouldCache : @NO};
+    CGImageSourceRef source = CGImageSourceCreateWithURL((__bridge CFURLRef)url, (__bridge CFDictionaryRef)options);
     
     if (source) {
         CFDictionaryRef metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil);

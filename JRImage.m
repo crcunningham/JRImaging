@@ -32,33 +32,33 @@
 static inline NSCompositingOperation CompositeOpForBlendMode(CGBlendMode mode) {
     switch (mode) {
         case kCGBlendModeClear:
-            return NSCompositeClear;
+            return NSCompositingOperationClear;
         case kCGBlendModeCopy:
-            return NSCompositeCopy;
+            return NSCompositingOperationCopy;
         case kCGBlendModeNormal:
-            return NSCompositeSourceOver;
+            return NSCompositingOperationSourceOver;
         case kCGBlendModeSourceIn:
-            return NSCompositeSourceIn;
+            return NSCompositingOperationSourceIn;
         case kCGBlendModeSourceOut:
-            return NSCompositeSourceOut;
+            return NSCompositingOperationSourceOut;
         case kCGBlendModeSourceAtop:
-            return NSCompositeSourceAtop;
+            return NSCompositingOperationSourceAtop;
         case kCGBlendModeDestinationOver:
-            return NSCompositeDestinationOver;
+            return NSCompositingOperationDestinationOver;
         case kCGBlendModeDestinationIn:
-            return NSCompositeDestinationIn;
+            return NSCompositingOperationDestinationIn;
         case kCGBlendModeDestinationOut:
-            return NSCompositeDestinationOut;
+            return NSCompositingOperationDestinationOut;
         case kCGBlendModeDestinationAtop:
-            return NSCompositeDestinationAtop;
+            return NSCompositingOperationDestinationAtop;
         case kCGBlendModeXOR:
-            return NSCompositeXOR;
+            return NSCompositingOperationXOR;
         case kCGBlendModePlusDarker:
-            return NSCompositePlusDarker;
+            return NSCompositingOperationPlusDarker;
         case kCGBlendModePlusLighter:
-            return NSCompositePlusLighter;
+            return NSCompositingOperationPlusLighter;
         default:
-            return NSCompositeSourceOver;
+            return NSCompositingOperationSourceOver;
     }
 }
 #endif
