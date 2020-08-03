@@ -22,6 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import <ImageIO/ImageIO.h>
+#import <TargetConditionals.h>
 
 #if TARGET_OS_IPHONE
 #import <MobileCoreServices/MobileCoreServices.h>

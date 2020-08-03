@@ -21,5 +21,6 @@
 // SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import <ImageIO/ImageIO.h>
 
 CGImageRef JRAutoreleaseImage(CGImageRef CF_CONSUMED object);
