@@ -81,7 +81,7 @@ static inline NSCompositingOperation CompositeOpForBlendMode(CGBlendMode mode) {
 
 - (id)initWithCGImage:(CGImageRef)cgImage scale:(CGFloat)scale orientation:(JRImageOrientation)orientation {
 #if TARGET_OS_IPHONE
-	self = [super initWithCGImage:cgImage scale:scale orientation:(JRImageOrientation)orientation];
+	self = [super initWithCGImage:cgImage scale:scale orientation:(UIImageOrientation)orientation];
 	if (self) {
 		
 	}
